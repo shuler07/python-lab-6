@@ -1,14 +1,19 @@
 from src.task_sources import TaskFileSource, TaskGeneratorSource, TaskApiSource
-from src.task_process import process_tasks
+from src.task_process import TaskProcessor
 
 
 def main():
     sources = []
-    sources.append(TaskFileSource(path='./data.json'))
+    sources.append(TaskFileSource(path='./example.json'))
     sources.append(TaskGeneratorSource())
     sources.append(TaskApiSource())
 
-    process_tasks(sources)
+    task_processor = TaskProcessor()
+
+    for source in sources:
+        task_processor.process_task(source=source)
+        task_processor.process_task(source=source)
+        task_processor.process_task(source=source)
 
 
 if __name__ == '__main__':
