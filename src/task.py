@@ -5,9 +5,10 @@ from dataclasses import dataclass
 @dataclass
 class Task:
     id: int
-    payload: Any
+    payload: dict[str, Any]
 
 
 @runtime_checkable
 class TaskSource(Protocol):
     def get_tasks(self) -> List[Task]: ...
+    def get_task(self) -> Task: ...
