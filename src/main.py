@@ -3,6 +3,7 @@ from src.task_process import TaskProcessor
 
 
 def main():
+    "Main program"
     sources = []
     sources.append(TaskFileSource(path='./example.json'))
     sources.append(TaskGeneratorSource())

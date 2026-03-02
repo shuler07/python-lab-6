@@ -3,13 +3,26 @@ from src.task import TaskSource
 
 
 class TaskProcessor:
+    """
+    Object for processing tasks from different sources
+    """
     def __init__(self):
         pass
 
     def _is_task_source_valid(self, source: TaskSource) -> bool:
+        """
+        Validate task source
+        Returns:
+            bool: is source valid
+        """
         return isinstance(source, TaskSource)
 
     def process_task(self, source: TaskSource) -> None:
+        """
+        Process task from source
+        Args:
+            source (TaskSource): source
+        """
         if not self._is_task_source_valid(source):
             print("Object", source.__class__.__name__, "is wrong task source")
             logger.error("Object %s is wrong task source", source.__class__.__name__)
@@ -25,6 +38,11 @@ class TaskProcessor:
             print("Task not found")
 
     def process_tasks(self, source: TaskSource) -> None:
+        """
+        Process all tasks from source
+        Args:
+            source (TaskSource): source
+        """
         if not self._is_task_source_valid(source):
             print("Object", source.__class__.__name__, "is wrong task source")
             logger.error("Object %s is wrong task source", source.__class__.__name__)

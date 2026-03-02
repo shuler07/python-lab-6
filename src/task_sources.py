@@ -11,6 +11,12 @@ from src.constants import SEED
 seed(SEED)
 
 class TaskFileSource:
+    """
+    Object for loading tasks by iterating over loaded list from json
+    If file not found - warning message will be printed
+    Args:
+        path (PathLike): file path
+    """
     def __init__(self, path: PathLike) -> None:
         tasks: List[dict[str, Any]] = []
         try:
@@ -24,6 +30,11 @@ class TaskFileSource:
         self.path = path
 
     def get_tasks(self) -> List[Task]:
+        """
+        Load all tasks left in the file
+        Returns:
+            List[Task]: loaded tasks
+        """
         tasks: List[Task] = []
         while (task := self.get_task()):
             tasks.append(task)
@@ -31,6 +42,11 @@ class TaskFileSource:
         return tasks
 
     def get_task(self) -> Task | None:
+        """
+        Load next task from the file
+        Returns:
+            Task|None: Task object or None, if no task left in the file
+        """
         try:
             task_json = self.tasks_iter.__next__()
             task = Task(id=task_json['id'], payload=task_json['payload'])
@@ -42,25 +58,45 @@ class TaskFileSource:
 
 
 class TaskGeneratorSource:
+    """
+    Object for generating random tasks
+    """
     _words = ['some', 'random', 'words', 'home', 'task', \
               'action', 'give', 'length', 'music', 'work', \
                 'free', 'stop', 'rating', 'bus', 'money',]
     def __init__(self) -> None:
         pass
 
-    def get_tasks(self, amount: int = 10) -> List[Task]:
+    def get_tasks(self, count: int = 10) -> List[Task]:
+        """
+        Generate certain count of tasks
+        Args:
+            count (int): tasks count
+        Returns:
+            List[Task]: generated tasks
+        """
         tasks: List[Task] = []
-        for _ in range(amount):
+        for _ in range(count):
             tasks.append(self.get_task())
         logger.info('Got %d tasks from generator source', len(tasks))
         return tasks
 
     def get_task(self) -> Task:
+        """
+        Generate task
+        Returns:
+            Task: generated task
+        """
         task = Task(id=randint(1, 99_999), payload=self._get_payload())
         logger.info('Got task from generator source')
         return task
 
-    def _get_payload(self) -> Any:
+    def _get_payload(self) -> dict[str, Any]:
+        """
+        Generate random payload for task
+        Returns:
+            dict[str,Any]: generated payload
+        """
         payload: dict[str, Any] = {}
         payload_items_count = randint(1, 10)
         while len(payload) < payload_items_count:
@@ -78,11 +114,18 @@ class TaskGeneratorSource:
 
 
 class TaskApiSource:
-
+    """
+    Object for getting tasks from API
+    """
     def __init__(self) -> None:
         pass
 
     def get_tasks(self) -> List[Task]:
+        """
+        Get all tasks from API
+        Returns:
+            List[Task]: tasks
+        """
         tasks: List[Task] = []
         tasks_count = randint(1, 10)
         for _ in range(tasks_count):
@@ -93,6 +136,11 @@ class TaskApiSource:
         return tasks
 
     def get_task(self) -> Task | None:
+        """
+        Get task from API
+        Returns:
+            Task: task
+        """
         if randint(1, 5) != 1:
             task = Task(id=randint(1, 99_999), payload={'hardcoded': 'payload', 'useless': 'text', 'don\'t': 'read'})
             logger.info('Got task from API source')
