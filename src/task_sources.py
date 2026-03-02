@@ -10,7 +10,7 @@ from src.constants import SEED
 
 seed(SEED)
 
-class TaskFileSource:
+class TaskJsonSource:
     """
     Object for loading tasks by iterating over loaded list from json
     If file not found - warning message will be printed

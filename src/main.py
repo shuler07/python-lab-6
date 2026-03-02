@@ -1,11 +1,11 @@
-from src.task_sources import TaskFileSource, TaskGeneratorSource, TaskApiSource
+from src.task_sources import TaskJsonSource, TaskGeneratorSource, TaskApiSource
 from src.task_process import TaskProcessor
 
 
 def main():
     "Main program"
     sources = []
-    sources.append(TaskFileSource(path='./example.json'))
+    sources.append(TaskJsonSource(path='./example.json'))
     sources.append(TaskGeneratorSource())
     sources.append(TaskApiSource())
 
