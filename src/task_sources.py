@@ -3,6 +3,7 @@ from typing import List, Any
 import json
 from random import randint, choice, choices, seed
 
+from src.logger import logger
 from src.task import Task
 from src.constants import SEED
 
@@ -17,21 +18,26 @@ class TaskFileSource:
                 tasks = json.load(f)
         except FileNotFoundError:
             print(f'File {path} not found')
+            logger.warning('File %s not found', path)
             tasks = []
         self.tasks_iter = iter(tasks)
+        self.path = path
 
     def get_tasks(self) -> List[Task]:
         tasks: List[Task] = []
         while (task := self.get_task()):
             tasks.append(task)
+        logger.info('Got %d tasks from file source: %s', len(tasks), self.path)
         return tasks
 
     def get_task(self) -> Task | None:
         try:
             task_json = self.tasks_iter.__next__()
             task = Task(id=task_json['id'], payload=task_json['payload'])
+            logger.info('Got task from file source: %s', self.path)
             return task
         except StopIteration:
+            logger.info('No more tasks from file source: %s', self.path)
             return None
 
 
@@ -46,10 +52,12 @@ class TaskGeneratorSource:
         tasks: List[Task] = []
         for _ in range(amount):
             tasks.append(self.get_task())
+        logger.info('Got %d tasks from generator source', len(tasks))
         return tasks
 
     def get_task(self) -> Task:
         task = Task(id=randint(1, 99_999), payload=self._get_payload())
+        logger.info('Got task from generator source')
         return task
 
     def _get_payload(self) -> Any:
@@ -81,11 +89,14 @@ class TaskApiSource:
             task = self.get_task()
             if task is not None:
                 tasks.append(task)
+        logger.info('Got %d tasks from API source', len(tasks))
         return tasks
 
     def get_task(self) -> Task | None:
         if randint(1, 5) != 1:
             task = Task(id=randint(1, 99_999), payload={'hardcoded': 'payload', 'useless': 'text', 'don\'t': 'read'})
+            logger.info('Got task from API source')
         else:
             task = None
+            logger.info('No task from API source')
         return task
