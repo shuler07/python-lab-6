@@ -98,6 +98,6 @@ def test_generator_source(task_processor: TaskProcessor, mocker: MockerFixture):
 
     mocked_print = mocker.patch("builtins.print")
     mocked_tasks = mocker.patch.object(source, "get_tasks", return_value=get_random_tasks(3))
-    task_processor.process_tasks(source)
+    task_processor.process_tasks(cast(TaskSource, source))
     mocked_tasks.assert_called_once()
     assert mocked_print.call_count == 4
