@@ -27,10 +27,16 @@ class TaskJsonSource:
         self.path = path
         try:
             with open(file=path, mode='r') as f:
-                self.tasks_iter = iter(json.load(f))
+                loaded = json.load(f)
+                if not isinstance(loaded, list):
+                    raise TypeError
+                self.tasks_iter = iter(loaded)
         except FileNotFoundError:
             print(f'File {path} not found')
             logger.warning('File %s not found', path)
+        except TypeError:
+            print(f'Json must contain list, but it contains {loaded.__class__.__name__}')
+            logger.error('Json must contain list, but it contains %s', loaded.__class__.__name__)
 
     def get_tasks(self) -> List[Task]:
         """
