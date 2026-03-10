@@ -5,3 +5,5 @@ htmlcov
 .pytest_cache
 .coverage
 shell.log
+.mypy_cache
+.ruff_cache
