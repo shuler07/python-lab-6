@@ -56,7 +56,7 @@ def task_get(
 def task_process(
     source: Annotated[Literal['generator', 'api', 'json'], typer.Argument(help='...')] = 'generator',
     path: Annotated[Optional[Path], typer.Option('-p', '--path', help='...')] = None,
-    is_all_tasks: Annotated[bool, typer.Option(..., '-a', '-all')] = False
+    is_all_tasks: Annotated[bool, typer.Option(..., '-a', '--all')] = False
 ):
     match source:
         case 'generator':
