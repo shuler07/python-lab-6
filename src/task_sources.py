@@ -1,5 +1,5 @@
-from os import PathLike
-from typing import List, Any
+from pathlib import Path
+from typing import List, Any, Optional, Iterator
 import json
 from random import randint, choice, choices, seed
 
@@ -17,17 +17,20 @@ class TaskJsonSource:
     Args:
         path (PathLike): file path
     """
-    def __init__(self, path: PathLike) -> None:
-        tasks: List[dict[str, Any]] = []
+    def __init__(self, path: Optional[Path] = None) -> None:
+        self.tasks_iter: Iterator[dict[str, Any]] = iter([])
+        self.path = path
+        if path is not None:
+            self.open(path)
+
+    def open(self, path: Path) -> None:
+        self.path = path
         try:
             with open(file=path, mode='r') as f:
-                tasks = json.load(f)
+                self.tasks_iter = iter(json.load(f))
         except FileNotFoundError:
             print(f'File {path} not found')
             logger.warning('File %s not found', path)
-            tasks = []
-        self.tasks_iter = iter(tasks)
-        self.path = path
 
     def get_tasks(self) -> List[Task]:
         """
