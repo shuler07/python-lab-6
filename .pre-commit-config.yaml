@@ -9,6 +9,7 @@ repos:
           - types-PyYAML
           - pytest
           - pytest_mock
+          - typer
 
 
 
