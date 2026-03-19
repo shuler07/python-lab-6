@@ -76,7 +76,7 @@ class TaskGeneratorSource:
     def __init__(self) -> None:
         pass
 
-    def get_tasks(self, count: int = 10) -> List[Task]:
+    def get_tasks(self) -> List[Task]:
         """
         Generate certain count of tasks
         Args:
@@ -85,7 +85,8 @@ class TaskGeneratorSource:
             List[Task]: generated tasks
         """
         tasks: List[Task] = []
-        while len(tasks) != count:
+        tasks_count = randint(1, 10)
+        while len(tasks) != tasks_count:
             task = self.get_task()
             if task:
                 tasks.append(task)
