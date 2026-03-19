@@ -37,6 +37,9 @@ class TaskJsonSource:
         except TypeError:
             print(f'Json must contain list, but it contains {loaded.__class__.__name__}')
             logger.error('Json must contain list, but it contains %s', loaded.__class__.__name__)
+        except json.JSONDecodeError:
+            print(f'Json decode error. Check is file {path} correct')
+            logger.error('Json decode error. Check is file %s correct', path)
 
     def get_tasks(self) -> List[Task]:
         """
