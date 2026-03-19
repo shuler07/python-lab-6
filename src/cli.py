@@ -1,14 +1,14 @@
 import typer
-from typing import Annotated, Literal, Optional, List
+from typing import Annotated, Literal, Optional, Iterator, Iterable
 from pathlib import Path
 
 from src.task_sources import TaskJsonSource, TaskGeneratorSource, TaskApiSource
 from src.task_process import TaskProcessor
-from src.task import Task, TaskSource
+from src.task import Task
 
 
-app = typer.Typer(name='...', help='...')
-task_app = typer.Typer(name='task', help='...')
+app = typer.Typer(name='Tasker', help='Platform to work with tasks')
+task_app = typer.Typer(name='task', help='Task processing')
 
 task_processor = TaskProcessor()
 task_generator_source = TaskGeneratorSource()
@@ -16,60 +16,71 @@ task_json_source = TaskJsonSource()
 task_api_source = TaskApiSource()
 
 
-def get_from_source(source: TaskSource, is_all_tasks: bool) -> Task | List[Task] | None:
-    return source.get_tasks() if is_all_tasks else source.get_task()
-
-def process_from_source(source: TaskSource, is_all_tasks: bool) -> None:
-    return task_processor.process_tasks(source) if is_all_tasks else task_processor.process_task(source)
-
-
-@task_app.command(name='get', help='...')
+@task_app.command(name='get', help='Get tasks from source')
 def task_get(
-    source: Annotated[Literal['generator', 'api', 'json'], typer.Argument(help='...')] = 'generator',
-    path: Annotated[Optional[Path], typer.Option('-p', '--path', help='...')] = None,
-    is_all_tasks: Annotated[bool, typer.Option('-a', '--all', help='...')] = False,
+    source: Annotated[Literal['generator', 'api', 'json'], typer.Argument(help='Task source')] = 'generator',
+    path: Annotated[Optional[Path], typer.Option('-p', '--path', help='Filepath (using only with json source)')] = None,
+    is_all_tasks: Annotated[bool, typer.Option('-a', '--all', help='Get all possible tasks')] = False,
 ):
-    data: Task | List[Task] | None
+    data: Task | Iterator[Task] | None
     match source:
         case 'generator':
-            data = get_from_source(task_generator_source, is_all_tasks)
+            if is_all_tasks:
+                data = task_generator_source.get_tasks()
+            else:
+                data = task_generator_source.get_task()
         case 'api':
-            data = get_from_source(task_api_source, is_all_tasks)
+            if is_all_tasks:
+                data = task_api_source.get_tasks()
+            else:
+                data = task_api_source.get_task()
         case 'json':
             if path is None:
                 raise typer.BadParameter('Json task source requires -p / --path parameter')
             if not str(path).endswith('.json'):
                 raise typer.BadParameter('Expected .json file')
             task_json_source.open(path)
-            data = get_from_source(task_json_source, is_all_tasks)
+            if is_all_tasks:
+                data = task_json_source.get_tasks()
+            else:
+                data = task_json_source.get_task()
 
     if isinstance(data, Task):
         typer.echo(data)
-    elif isinstance(data, list):
+    elif isinstance(data, Iterable):
         for task in data:
             typer.echo(task)
     else:
         typer.echo("No task")
 
 
-@task_app.command(name='process', help='...')
+@task_app.command(name='process', help='Process tasks from source')
 def task_process(
-    source: Annotated[Literal['generator', 'api', 'json'], typer.Argument(help='...')] = 'generator',
-    path: Annotated[Optional[Path], typer.Option('-p', '--path', help='...')] = None,
-    is_all_tasks: Annotated[bool, typer.Option(..., '-a', '--all')] = False
+    source: Annotated[Literal['generator', 'api', 'json'], typer.Argument(help='Tasks source')] = 'generator',
+    path: Annotated[Optional[Path], typer.Option('-p', '--path', help='Filepath (using only with json source)')] = None,
+    is_all_tasks: Annotated[bool, typer.Option(..., '-a', '--all', help='Process all possible tasks')] = False
 ):
     match source:
         case 'generator':
-            process_from_source(task_generator_source, is_all_tasks)
+            if is_all_tasks:
+                task_processor.process_tasks(task_generator_source)
+            else:
+                task_processor.process_task(task_generator_source)
         case 'api':
-            process_from_source(task_api_source, is_all_tasks)
+            if is_all_tasks:
+                task_processor.process_tasks(task_api_source)
+            else:
+                task_processor.process_task(task_api_source)
         case 'json':
             if path is None:
                 raise typer.BadParameter('Json task source requires -p / --path parameter')
             if not str(path).endswith('.json'):
                 raise typer.BadParameter('Expected .json file')
             task_json_source.open(path)
-            process_from_source(task_json_source, is_all_tasks)
+            if is_all_tasks:
+                task_processor.process_tasks(task_json_source)
+            else:
+                task_processor.process_task(task_json_source)
 
 
 app.add_typer(task_app)
