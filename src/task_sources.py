@@ -1,14 +1,11 @@
 from pathlib import Path
 from typing import List, Any, Optional, Iterator
 import json
-from random import randint, choice, choices, seed
+from random import randint, choice, choices
 
 from src.logger import logger
 from src.task import Task
-from src.constants import SEED
 
-
-seed(SEED)
 
 class TaskJsonSource:
     """
