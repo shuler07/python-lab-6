@@ -85,20 +85,24 @@ class TaskGeneratorSource:
             List[Task]: generated tasks
         """
         tasks: List[Task] = []
-        for _ in range(count):
-            tasks.append(self.get_task())
+        while len(tasks) != count:
+            task = self.get_task()
+            if task:
+                tasks.append(task)
         logger.info('Got %d tasks from generator source', len(tasks))
         return tasks
 
-    def get_task(self) -> Task:
+    def get_task(self) -> Task | None:
         """
         Generate task
         Returns:
             Task: generated task
         """
-        task = Task(id=randint(1, 99_999), payload=self._get_payload())
-        logger.info('Got task from generator source')
-        return task
+        if randint(1, 10) != 1:
+            task = Task(id=randint(1, 99_999), payload=self._get_payload())
+            logger.info('Got task from generator source')
+            return task
+        return None
 
     def _get_payload(self) -> dict[str, Any]:
         """
