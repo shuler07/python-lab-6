@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Any, Optional, Iterator
+from typing import Any, Optional, Iterator
 import json
 from random import randint, choice, choices
 
@@ -38,17 +38,14 @@ class TaskJsonSource:
             print(f'Json decode error. Check is file {path} correct')
             logger.error('Json decode error. Check is file %s correct', path)
 
-    def get_tasks(self) -> List[Task]:
+    def get_tasks(self) -> Iterator[Task]:
         """
-        Load all tasks left in the file
+        Load tasks left in the file
         Returns:
-            List[Task]: loaded tasks
+            Iterator[Task]: tasks iterator
         """
-        tasks: List[Task] = []
         while (task := self.get_task()):
-            tasks.append(task)
-        logger.info('Got %d tasks from file source: %s', len(tasks), self.path)
-        return tasks
+            yield task
 
     def get_task(self) -> Task | None:
         """
@@ -76,22 +73,19 @@ class TaskGeneratorSource:
     def __init__(self) -> None:
         pass
 
-    def get_tasks(self) -> List[Task]:
+    def get_tasks(self) -> Iterator[Task]:
         """
         Generate certain count of tasks
         Args:
             count (int): tasks count
         Returns:
-            List[Task]: generated tasks
+            Iterator[Task]: tasks iterator
         """
-        tasks: List[Task] = []
         tasks_count = randint(1, 10)
-        while len(tasks) != tasks_count:
-            task = self.get_task()
-            if task:
-                tasks.append(task)
-        logger.info('Got %d tasks from generator source', len(tasks))
-        return tasks
+        for _ in range(tasks_count):
+            if (task := self.get_task()) is not None:
+                yield task
+        logger.info('Got %d tasks from generator source', tasks_count)
 
     def get_task(self) -> Task | None:
         """
@@ -134,20 +128,17 @@ class TaskApiSource:
     def __init__(self) -> None:
         pass
 
-    def get_tasks(self) -> List[Task]:
+    def get_tasks(self) -> Iterator[Task]:
         """
-        Get all tasks from API
+        Get tasks from API
         Returns:
-            List[Task]: tasks
+            Iterator[Task]: tasks
         """
-        tasks: List[Task] = []
         tasks_count = randint(1, 10)
         for _ in range(tasks_count):
-            task = self.get_task()
-            if task is not None:
-                tasks.append(task)
-        logger.info('Got %d tasks from API source', len(tasks))
-        return tasks
+            if (task := self.get_task()) is not None:
+                yield task
+        logger.info('Got %d tasks from API source', tasks_count)
 
     def get_task(self) -> Task | None:
         """

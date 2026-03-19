@@ -31,12 +31,14 @@ class TaskProcessor:
         logger.info("Processing tasks from object %s", source.__class__.__name__)
 
         tasks = source.get_tasks()
-        if len(tasks) > 0:
-            for task in tasks:
-                print(f"Task #{task.id} processed, payload: {task.payload}")
-                logger.info("Task #%s processed", task.id)
-        else:
-            print("Tasks not found")
+        processed = 0
+        for task in tasks:
+            print(f"Task #{task.id} processed, payload: {task.payload}")
+            logger.info("Task #%s processed", task.id)
+            processed += 1
+        if processed == 0:
+            print("No tasks found")
+
 
     def process_task(self, source: TaskSource) -> None:
         """

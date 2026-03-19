@@ -1,4 +1,4 @@
-from typing import Any, Protocol, runtime_checkable, List
+from typing import Any, Protocol, runtime_checkable, Iterator
 from dataclasses import dataclass
 
 
@@ -10,5 +10,5 @@ class Task:
 
 @runtime_checkable
 class TaskSource(Protocol):
-    def get_tasks(self) -> List[Task]: ...
+    def get_tasks(self) -> Iterator[Task]: ...
     def get_task(self) -> Task | None: ...
