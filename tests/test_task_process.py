@@ -2,33 +2,40 @@ import pytest
 from pytest_mock import MockerFixture
 import json
 from pathlib import Path
-from typing import List, cast
-from dataclasses import asdict
+from typing import Iterator, cast, Iterable, List
 
 from src.task_sources import TaskApiSource, TaskJsonSource, TaskGeneratorSource
 from src.task_process import TaskProcessor
 from src.task import Task, TaskSource
 
 
-def get_random_tasks(n: int) -> List[Task]:
+def get_random_tasks(n: int) -> Iterator[Task]:
     """
-    Generates list containing n tasks
+    Generator containing n tasks
     Args:
         n (int): count
     Returns:
-        List[Task]: tasks
+        Iterator[Task]: tasks generator
     """
-    return [Task(id=i, payload={"data": f"value{i}"}) for i in range(1, n + 1)]
+    return (Task(id=i, payload={"data": f"value{i}"}) for i in range(1, n + 1))
 
 @pytest.fixture
 def test_json_file(tmp_path):
     "Creates temporary json file"
     file_path = tmp_path / "file.json"
-    tasks = get_random_tasks(5)
-    tasks_asdict = [asdict(task) for task in tasks]
+    tasks: List[Task] = []
+    for task in get_random_tasks(5):
+        tasks.append({
+            'id': task.id,
+            'payload': task.payload,
+            'description': task.description,
+            'status': task.status,
+            'priority': task.priority,
+            'ts_created_at': task.ts_created_at
+        })
 
     with open(file_path, "w") as f:
-        json.dump(tasks_asdict, f)
+        json.dump(tasks, f)
 
     yield file_path
 
@@ -44,7 +51,7 @@ def test_api_source(task_processor: TaskProcessor, mocker: MockerFixture):
     assert isinstance(source, TaskApiSource)
 
     tasks = source.get_tasks()
-    assert isinstance(tasks, list)
+    assert isinstance(tasks, Iterable)
     for task in tasks:
         assert isinstance(task, Task)
 
@@ -63,7 +70,7 @@ def test_file_source(test_json_file: Path, task_processor: TaskProcessor, mocker
     assert isinstance(source, TaskJsonSource)
 
     tasks = source.get_tasks()
-    assert isinstance(tasks, list)
+    assert isinstance(tasks, Iterable)
     for task in tasks:
         assert isinstance(task, Task)
 
@@ -89,7 +96,7 @@ def test_generator_source(task_processor: TaskProcessor, mocker: MockerFixture):
     assert isinstance(source, TaskGeneratorSource)
 
     tasks = source.get_tasks()
-    assert isinstance(tasks, list)
+    assert isinstance(tasks, Iterable)
     for task in tasks:
         assert isinstance(task, Task)
 
