@@ -20,11 +20,11 @@ class Task:
         self.status = payload.get("status", "idle")
         self.priority = payload.get("priority", "low")
 
-        self.created_at = datetime.now(timezone.utc)
+        self.ts_created_at = datetime.now(timezone.utc).timestamp()
 
     def __str__(self) -> str:
         return f"Task(id={self.id}, payload={self.payload}, description={self.description}, \
-status={self.status}, priority={self.priority}, created_at={self.created_at})"
+status={self.status}, priority={self.priority}, ts_created_at={self.ts_created_at})"
 
     def __repr__(self) -> str:
         return self.__str__()
